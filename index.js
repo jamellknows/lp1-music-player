@@ -5,13 +5,15 @@ let track_artist = document.querySelector(".track-artist")
 
 let playpause_btn = document.querySelector(".playpause-track")
 let next_btn = document.querySelector(".next-track")
-let prev_btn = document.querySelector(".prev_track")
+let prev_btn = document.querySelector(".prev-track")
 
 
-let seek_slider = document.querySelector(".seek_slider")
-let volume_slider = document.querySelector(".volume_slider")
-let curr_time = document.querySelector(".current_time")
+let seek_slider = document.querySelector(".seek-slider")
+let volume_slider = document.querySelector(".volume-slider")
+let curr_time = document.querySelector(".current-time")
 let total_duration = document.querySelector(".total-duration")
+
+curr_time.textContent = "00:00"
 
 let track_index = 0;
 let isPlaying = false
@@ -20,27 +22,25 @@ let updateTimer;
 
 let curr_track = document.createElement('audio')
 
+
 let track_list = [
     {
-        name: "",
-        artist: "",
-        image: "",
-        path:
+        name: "Boys Who Cry",
+        artist: "Jamell",
+        image: "/public/music/coverImage.jpg",
+        path: "/public/music/Boys Who Cry.wav"
     },
     {
         name: "",
         artist: "",
-        image: "",
-        path:
+        image: "/public/music/coverImage.jpg",
+        path: "/public/music/Bruce Montanna.wav"
     },
-    {
-        name: "",
-        artist: "",
-        image: "",
-        path:
-    },
-]
 
+]
+//curr_track.src = track_list[0].path
+//console.log(track_list[0])
+// console.log(curr_track.name)
 function loadTrack(track_index){
     clearInterval(updateTimer);
     resetValues();
@@ -59,13 +59,15 @@ function loadTrack(track_index){
     random_bg_color();
 }
 
+
 function random_bg_color() {
     let red = Math.floor(Math.random() * 256) + 64;
     let green = Math.floor(Math.random() * 256) + 64;
     let blue = Math.floor(Math.random() * 256) + 64;
 
     let bgColor = "rgb(" + red + ", " + green + ", " + blue +")";
-    let bgColor2 = "rgb"+ str(set(red, gree, blue))
+    let bgColor2 = new Set([red, green, blue])
+    bgColor2 = Array.from(bgColor2).join(',')
     console.log(bgColor2)
 
     document.body.style.background = bgColor;
@@ -76,3 +78,77 @@ function resetValues() {
     total_duration.textContent = "00:00"
     seek_slider.value = 0;
 }
+
+
+function playpauseTrack(){
+    if(!isPlaying) playTrack();
+    else pauseTrack()
+}
+
+
+function playTrack(){
+    curr_track.play();
+    isPlaying = true
+}
+
+function pauseTrack(){
+    curr_track.pause();
+    isPlaying = false;
+}
+
+function nextTrack(){
+    if(track_index < track_list.length - 1){
+        track_index += 1;
+    }
+    else track_index = 0;
+
+    loadTrack(track_index);
+    playTrack()
+}
+
+
+function prevTrack() {
+    if(track_index > 0){
+        track_index -=1;
+    }
+    else{
+        track_index = track_list.length - 1;
+    }
+}
+
+
+
+function seekTo() {
+    seekto = curr_track.duration * (seek_slider.value / 100)
+
+    curr_track.currentTime = seekto
+}
+
+function setVolume(){
+    curr_track.volume = volume_slider.value / 100
+}
+
+function seekUpdate(){
+    let seekPosition = 0;
+
+    if(!isNaN(curr_track.duration)){
+        seekPosition = curr_track.currentTime * (100/ curr_track.duration)
+        seek_slider.value = seekPosition;
+
+        let currentMinutes = Math.floor(curr_track.currentTime / 60)
+        let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60)
+        let durationMinutes = Math.floor(curr_track.duration / 60)
+        let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60)
+
+        if(currentSeconds < 10) { currentSeconds = '0' + currentSeconds}
+        if(durationSeconds < 10) { durationSeconds = '0' + durationSeconds}
+        if(currentMinutes < 10) { currentMinutes = '0' + currentMinutes}
+        if(durationMinutes < 10) { durationMinutes = '0' + durationMinutes}
+
+        curr_time.textContent = currentMinutes + ":" + currentSeconds;
+        total_duration.textContent = durationMinutes + ":" + durationMinutes
+        
+    }
+}
+
+loadTrack(0)
